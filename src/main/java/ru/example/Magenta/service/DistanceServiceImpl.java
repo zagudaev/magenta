@@ -30,13 +30,12 @@ public class DistanceServiceImpl implements DistanceService {
                     distanceDTO.getToCity());
         }
         Distance distance = distanceDTO.toDistance(cityDAO);
-        DistanceDTO distanceDTORevers = null;
-      // System.out.println(distance.getToCity().getName());
-      // distanceDTORevers.setFromCity(distance.getToCity().getName());
-      // distanceDTORevers.setToCity(distance.getFromCity().getName());
-      // distanceDTORevers.setDistance(distanceDTO.getDistance());
-      // Distance distanceRevers = distanceDTORevers.toDistance(cityDAO);
-      // distanceDAO.save(distanceRevers);
+        DistanceDTO distanceDTORevers = new DistanceDTO(distance);
+       distanceDTORevers.setFromCity(distance.getToCity().getName());
+       distanceDTORevers.setToCity(distance.getFromCity().getName());
+       distanceDTORevers.setDistance(distanceDTO.getDistance());
+       Distance distanceRevers = distanceDTORevers.toDistance(cityDAO);
+       distanceDAO.save(distanceRevers);
         return distanceDAO.save(distance).getId();
     }
 
