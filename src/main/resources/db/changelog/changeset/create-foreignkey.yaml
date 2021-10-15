@@ -1,0 +1,17 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-ForeignKey
+      author: zagudaev
+      changes:
+        - addForeignKeyConstraint:
+              baseColumnNames: fromCityid
+              baseTableName: distance
+              constraintName: fromCityid
+              referencedColumnNames: id
+              referencedTableName: city
+        - addForeignKeyConstraint:
+            baseColumnNames:  toCityid
+            baseTableName: distance
+            constraintName: toCityid
+            referencedColumnNames: id
+            referencedTableName: city

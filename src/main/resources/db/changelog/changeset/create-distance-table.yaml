@@ -1,0 +1,30 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-distance
+      author: zagudaev
+      changes:
+        - createTable:
+            tableName: distance
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: fromCityid
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: toCityid
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: distance
+                  type: double
+                  constraints:
+                    nullable: false
