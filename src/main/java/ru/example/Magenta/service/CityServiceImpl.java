@@ -6,53 +6,61 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import ru.example.Magenta.DTO.CityDTO;
+import ru.example.Magenta.exceptions.CityException;
 import ru.example.Magenta.model.City;
-import ru.example.Magenta.repository.CityDAO;
+import ru.example.Magenta.repository.CityRepository;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
+
+import static ru.example.Magenta.exceptions.CityException.*;
 
 @Service
 @AllArgsConstructor
 public class CityServiceImpl implements CityService{
 
-    private final CityDAO cityDAO;
+    private final CityRepository cityRepository;
 
     @Override
     @Transactional
     public Long create(CityDTO cityDTO) {
-        if (cityDAO.findByLatitudeAndLongitude(cityDTO.getLatitude(),cityDTO.getLongitude()).orElse(null) != null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Данные координаты уже заняты  : " + cityDTO.getLatitude() + ":" +
-                    cityDTO.getLongitude());
-        }
+        coordinatesAreBusy(cityDTO,cityRepository);
         City city = cityDTO.toCity();
-        return  cityDAO.save(city).getId();
+        return  cityRepository.save(city).getId();
     }
 
     @Override
     @Transactional
     public void update(CityDTO cityDTO) {
-       City city = cityDAO.findById(cityDTO.getId()).orElseThrow(()-> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Город с таким ID не найден : "+
-                cityDTO.getId()));
-       city = cityDTO.update(city);
-       cityDAO.save(city);
+        City city = cityRepository.findById(cityDTO.getId()).orElse(null);
+        cityIDNotFound(city,cityDTO.getId());
+        city = cityDTO.update(city);
+       cityRepository.save(city);
 
     }
-
+    @Override
+    public List<CityDTO> findAll() {
+        List<CityDTO> cityDTOList = new ArrayList<>();
+        List<City> cityList = cityRepository.findAll();
+        for (City city : cityList){
+            cityDTOList.add(new CityDTO(city.getId(),city.getName()));
+        }
+        return  cityDTOList;
+    }
     @Override
     @Transactional
     public void delete(Long id) {
-    if (cityDAO.findById(id).orElse(null) == null){
-        throw  new ResponseStatusException(HttpStatus.BAD_REQUEST, "Город с таким ID не найден : "+ id );
-    }
-    cityDAO.deleteById(id);
+    cityIDNotFound(cityRepository,id);
+    cityRepository.deleteById(id);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public CityDTO read(Long id) {
+    public CityDTO findById(Long id) {
 
-        City city = cityDAO.findById(id).orElseThrow(()->
-             new ResponseStatusException(HttpStatus.BAD_REQUEST, "Город с таким ID не найден : " + id));
+        City city = cityRepository.findById(id).orElse(null);
+        cityIDNotFound(city,id);
 
 
         return  new CityDTO(city);

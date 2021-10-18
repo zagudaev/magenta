@@ -1,0 +1,14 @@
+server:
+  port: 7071
+spring:
+  liquibase:
+    enabled: true
+  datasource:
+    url: jdbc:mysql://localhost:3306/distance-calculator
+    username: root
+    password: root
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: none
+

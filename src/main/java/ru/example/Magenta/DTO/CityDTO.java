@@ -1,6 +1,7 @@
 package ru.example.Magenta.DTO;
 
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import ru.example.Magenta.model.City;
 

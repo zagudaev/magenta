@@ -1,5 +1,6 @@
 package ru.example.Magenta.model;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -7,15 +8,11 @@ import lombok.Setter;
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlRootElement;
 
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
 @Entity
 @XmlRootElement
-public class City {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private  Long id;
+public class City extends ModelEntity {
+
 
     private String name;
 

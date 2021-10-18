@@ -9,5 +9,5 @@ public interface DistanceService {
     Long  create (DistanceDTO distanceDTO);
     void update(DistanceDTO distanceDTO);
     void  delete(Long id);
-    DistanceDTO read(Long id);
+    DistanceDTO findById(Long id);
 }

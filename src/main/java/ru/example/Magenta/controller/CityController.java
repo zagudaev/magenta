@@ -3,7 +3,6 @@ package ru.example.Magenta.controller;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.example.Magenta.DTO.CityDTO;
-import ru.example.Magenta.service.CityService;
 import ru.example.Magenta.service.CityServiceImpl;
 
 import java.util.List;
@@ -15,10 +14,8 @@ public class CityController {
     private final CityServiceImpl cityService;
 
 
-    @GetMapping("/hello")
-    public String hello(){
-        return  "hello";
-    }
+    @GetMapping("/all")
+    private List<CityDTO> findAll () { return  cityService.findAll();}
 
     @PostMapping("")
     private Long create (@RequestBody CityDTO cityDTO){return cityService.create(cityDTO);}
@@ -26,8 +23,8 @@ public class CityController {
     @PutMapping("")
     private void update(@RequestBody CityDTO cityDTO){  cityService.update(cityDTO);}
 
-    @GetMapping("/read/{id}")
-    private CityDTO read (@PathVariable Long id) { return  cityService.read(id);}
+    @GetMapping("/findbyid/{id}")
+    private CityDTO read (@PathVariable Long id) { return  cityService.findById(id);}
 
     @DeleteMapping("/delete/{id}")
     private void delete(@PathVariable Long id){ cityService.delete(id);}

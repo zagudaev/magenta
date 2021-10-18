@@ -1,9 +1,8 @@
 package ru.example.Magenta.DTO;
 
 import lombok.Data;
-import ru.example.Magenta.model.City;
 import ru.example.Magenta.model.Distance;
-import ru.example.Magenta.repository.CityDAO;
+import ru.example.Magenta.repository.CityRepository;
 
 @Data
 public class DistanceDTO {
@@ -14,16 +13,29 @@ public class DistanceDTO {
     private String toCity;
     private double  distance;
 
-    public Distance update(Distance distance, CityDAO cityDAO){
+    public Distance update(Distance distance, CityRepository cityRepository){
 
         distance.setDistance(this.distance);
-        distance.setFromCity(cityDAO.findByName(this.fromCity).orElse(null));
-        distance.setToCity(cityDAO.findByName(this.toCity).orElse(null));
+        distance.setFromCity(cityRepository.findByName(this.fromCity).orElse(null));
+        distance.setToCity(cityRepository.findByName(this.toCity).orElse(null));
         return distance;
     }
-    public Distance toDistance (CityDAO cityDAO){
+    public Distance toDistance (CityRepository cityRepository){
         Distance distance = new Distance();
-        distance = update(distance, cityDAO );
+        distance = update(distance, cityRepository);
+        return distance;
+    }
+
+    public Distance Revers(Distance distance, CityRepository cityRepository){
+
+        distance.setDistance(this.distance);
+        distance.setFromCity(cityRepository.findByName(this.toCity).orElse(null));
+        distance.setToCity(cityRepository.findByName(this.fromCity).orElse(null));
+        return distance;
+    }
+    public Distance toDistanceRevers (CityRepository cityRepository){
+        Distance distance = new Distance();
+        distance = Revers(distance, cityRepository);
         return distance;
     }
 

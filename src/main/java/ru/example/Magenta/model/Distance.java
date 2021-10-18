@@ -9,15 +9,11 @@ import javax.persistence.*;
 import javax.xml.bind.annotation.XmlRootElement;
 
 
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
 @Entity
 @XmlRootElement
-public class Distance {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private  Long id;
+public class Distance extends ModelEntity {
+
 
     @ManyToOne
     @JoinColumn(name = "fromCityid")
@@ -26,4 +22,6 @@ public class Distance {
     @JoinColumn(name = "toCityid")
     private City toCity;
     private double  distance;
+
+
 }

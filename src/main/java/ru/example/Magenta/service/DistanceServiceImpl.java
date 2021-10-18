@@ -5,65 +5,51 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import ru.example.Magenta.DTO.CityDTO;
 import ru.example.Magenta.DTO.DistanceDTO;
-import ru.example.Magenta.model.City;
+import ru.example.Magenta.exceptions.DistanceException;
 import ru.example.Magenta.model.Distance;
-import ru.example.Magenta.repository.CityDAO;
-import ru.example.Magenta.repository.DistanceDAO;
-
-import java.util.List;
-import java.util.Random;
+import ru.example.Magenta.repository.CityRepository;
+import ru.example.Magenta.repository.DistanceRepository;
 
 @Service
 @AllArgsConstructor
 public class DistanceServiceImpl implements DistanceService {
-    private final CityDAO cityDAO;
-    private final DistanceDAO distanceDAO;
+    private final CityRepository cityRepository;
+    private final DistanceRepository distanceRepository;
 
 
     @Override
     @Transactional
     public Long create(DistanceDTO distanceDTO) {
-        if (distanceDAO.findByToCityAndFromCity(distanceDTO.getToCity(), distanceDTO.getFromCity()).orElse(null) != null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "данное направление занято : " + distanceDTO.getFromCity() + ":" +
-                    distanceDTO.getToCity());
-        }
-        Distance distance = distanceDTO.toDistance(cityDAO);
-        DistanceDTO distanceDTORevers = new DistanceDTO(distance);
-       distanceDTORevers.setFromCity(distance.getToCity().getName());
-       distanceDTORevers.setToCity(distance.getFromCity().getName());
-       distanceDTORevers.setDistance(distanceDTO.getDistance());
-       Distance distanceRevers = distanceDTORevers.toDistance(cityDAO);
-       distanceDAO.save(distanceRevers);
-        return distanceDAO.save(distance).getId();
+        DistanceException.distanceIsBusy(distanceRepository,distanceDTO);
+        Distance distance = distanceDTO.toDistance(cityRepository);
+        Distance distanceRevers = distanceDTO.toDistanceRevers(cityRepository);
+        distanceRepository.save(distanceRevers);
+        return distanceRepository.save(distance).getId();
     }
 
     @Override
     @Transactional
     public void update(DistanceDTO distanceDTO) {
-        Distance distance = distanceDAO.findById(distanceDTO.getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Направление с таким ID не найдено : " +
-                +distanceDTO.getId()));
-        distance = distanceDTO.update(distance, cityDAO);
-        distanceDAO.save(distance);
+        Distance distance = distanceRepository.findById(distanceDTO.getId()).orElse(null);
+        DistanceException.distanceIDNotFound(distance,distanceDTO.getId());
+        distance = distanceDTO.update(distance, cityRepository);
+        distanceRepository.save(distance);
     }
 
     @Override
     @Transactional
     public void delete(Long id) {
-        if (distanceDAO.findById(id).orElse(null) == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Направление с таким ID не найдено : " + id);
-        }
-        distanceDAO.deleteById(id);
+        DistanceException.distanceIDNotFound(distanceRepository,id);
+        distanceRepository.deleteById(id);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public DistanceDTO read(Long id) {
-        Distance distance = distanceDAO.findById(id).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.BAD_REQUEST, "Направление с таким ID не найдено : " + +id));
-        DistanceDTO distanceDTO = new DistanceDTO(distance);
-        return distanceDTO;
+    public DistanceDTO findById(Long id) {
+        Distance distance = distanceRepository.findById(id).orElse(null);
+        DistanceException.distanceIDNotFound(distance,id);
+        return new DistanceDTO(distance);
     }
 
 
