@@ -12,6 +12,9 @@ import java.util.List;
 
 import static ru.example.Magenta.exceptions.CityException.*;
 
+/**
+ * Service for working with the City model
+ */
 @Service
 @AllArgsConstructor
 public class CityServiceImpl implements CityService{

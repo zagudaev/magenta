@@ -8,7 +8,9 @@ import ru.example.Magenta.exceptions.DistanceException;
 import ru.example.Magenta.model.Distance;
 import ru.example.Magenta.repository.CityRepository;
 import ru.example.Magenta.repository.DistanceRepository;
-
+/**
+ * Service for working with the City model
+ */
 @Service
 @AllArgsConstructor
 public class DistanceServiceImpl implements DistanceService {

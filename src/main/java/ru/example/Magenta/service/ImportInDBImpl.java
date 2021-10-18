@@ -16,11 +16,21 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
+
+/**
+ *Service imports data into DB
+ */
 @Service
 @AllArgsConstructor
 public class ImportInDBImpl implements ImportInDB {
     private final CityRepository cityRepository;
     private final DistanceRepository distanceRepository;
+
+    /**
+     *The method takes an XML file and imports data from it into DB
+     * @param file
+     * @return HTTP 200
+     */
     @Override
     @Transactional
     public ResponseEntity<Object> importXLMinDB(File file) {
