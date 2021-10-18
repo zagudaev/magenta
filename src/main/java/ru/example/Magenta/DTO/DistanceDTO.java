@@ -26,16 +26,12 @@ public class DistanceDTO {
         return distance;
     }
 
-    public Distance Revers(Distance distance, CityRepository cityRepository){
 
+    public Distance toDistanceRevers (CityRepository cityRepository){
+        Distance distance = new Distance();
         distance.setDistance(this.distance);
         distance.setFromCity(cityRepository.findByName(this.toCity).orElse(null));
         distance.setToCity(cityRepository.findByName(this.fromCity).orElse(null));
-        return distance;
-    }
-    public Distance toDistanceRevers (CityRepository cityRepository){
-        Distance distance = new Distance();
-        distance = Revers(distance, cityRepository);
         return distance;
     }
 
