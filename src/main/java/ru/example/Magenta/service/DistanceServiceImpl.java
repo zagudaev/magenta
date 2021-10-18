@@ -1,10 +1,8 @@
 package ru.example.Magenta.service;
 
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 import ru.example.Magenta.DTO.DistanceDTO;
 import ru.example.Magenta.exceptions.DistanceException;
 import ru.example.Magenta.model.Distance;
@@ -21,7 +19,7 @@ public class DistanceServiceImpl implements DistanceService {
     @Override
     @Transactional
     public Long create(DistanceDTO distanceDTO) {
-        DistanceException.distanceIsBusy(distanceRepository,distanceDTO);
+        DistanceException.distanceIsBusyException(distanceRepository,distanceDTO);
         Distance distance = distanceDTO.toDistance(cityRepository);
         Distance distanceRevers = distanceDTO.toDistanceRevers(cityRepository);
         distanceRepository.save(distanceRevers);
@@ -32,7 +30,7 @@ public class DistanceServiceImpl implements DistanceService {
     @Transactional
     public void update(DistanceDTO distanceDTO) {
         Distance distance = distanceRepository.findById(distanceDTO.getId()).orElse(null);
-        DistanceException.distanceIDNotFound(distance,distanceDTO.getId());
+        DistanceException.distanceIDNotFoundException(distance,distanceDTO.getId());
         distance = distanceDTO.update(distance, cityRepository);
         distanceRepository.save(distance);
     }
@@ -40,7 +38,7 @@ public class DistanceServiceImpl implements DistanceService {
     @Override
     @Transactional
     public void delete(Long id) {
-        DistanceException.distanceIDNotFound(distanceRepository,id);
+        DistanceException.distanceIDNotFoundException(distanceRepository,id);
         distanceRepository.deleteById(id);
     }
 
@@ -48,7 +46,7 @@ public class DistanceServiceImpl implements DistanceService {
     @Transactional(readOnly = true)
     public DistanceDTO findById(Long id) {
         Distance distance = distanceRepository.findById(id).orElse(null);
-        DistanceException.distanceIDNotFound(distance,id);
+        DistanceException.distanceIDNotFoundException(distance,id);
         return new DistanceDTO(distance);
     }
 

@@ -14,27 +14,27 @@ public class DistanceException extends ResponseStatusException {
         super(status, reason);
     }
 
-    public static void distanceIsBusy(DistanceRepository distanceRepository, DistanceDTO distanceDTO){
+    public static void distanceIsBusyException(DistanceRepository distanceRepository, DistanceDTO distanceDTO){
         if (distanceRepository.findByToCityAndFromCity(distanceDTO.getToCity(), distanceDTO.getFromCity()).orElse(null) != null) {
             throw new DistanceException(HttpStatus.BAD_REQUEST, "данное направление занято : " + distanceDTO.getFromCity() + ":" +
                     distanceDTO.getToCity());
         }
     }
 
-    public static void distanceIDNotFound (DistanceRepository distanceRepository, Long id){
+    public static void distanceIDNotFoundException(DistanceRepository distanceRepository, Long id){
         if (distanceRepository.findById(id).orElse(null) == null){
             throw  new DistanceException(HttpStatus.BAD_REQUEST, "Направление с таким ID не найдено : "+
                     id);
         }
     }
-    public static void distanceIDNotFound (Distance distance , Long id){
-        if (distance == null)
+    public static void distanceIDNotFoundException(Distance distance , Long id){
+        if (distance.getId() == null)
             throw new   DistanceException(HttpStatus.BAD_REQUEST, "Направление с таким ID не найдено : "+ id);
 
     }
 
 
-    public static void distanceNotFound (Distance distance , CityDTO fromCity, CityDTO toCity){
+    public static void distanceNotFoundException(Distance distance , CityDTO fromCity, CityDTO toCity){
         if (distance == null)
             throw new   DistanceException(HttpStatus.BAD_REQUEST, "Направление  не найдено : "+
                     fromCity.getName()  + " -> "+toCity.getName());

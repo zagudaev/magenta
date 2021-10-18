@@ -1,26 +1,14 @@
 package ru.example.Magenta.service;
 
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 import ru.example.Magenta.DTO.CityDTO;
-import ru.example.Magenta.DTO.DistanceDTO;
 import ru.example.Magenta.exceptions.DistanceException;
-import ru.example.Magenta.model.City;
 import ru.example.Magenta.model.Distance;
-import ru.example.Magenta.repository.CityRepository;
 import ru.example.Magenta.repository.DistanceRepository;
 import ru.example.Magenta.util.CalculationType;
-import ru.example.Magenta.util.CityAndDistanceHolder;
 
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,7 +43,7 @@ public class DistanceCalculationImpl implements DistanceCalculation {
     public double distanceMatrix(CityDTO fromCity, CityDTO toCity) {
         if (!fromCity.equals(toCity)){
         Distance distance = distanceRepository.findByToCityAndFromCity(fromCity.getName(),toCity.getName()).orElse(null);
-        DistanceException.distanceNotFound(distance,fromCity,toCity);
+        DistanceException.distanceNotFoundException(distance,fromCity,toCity);
         return  distance.getDistance();}
         else {return 0;}
     }
