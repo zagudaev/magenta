@@ -1,5 +1,6 @@
 package ru.example.Magenta.model;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -9,9 +10,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
-@Setter
-@Getter
-@NoArgsConstructor
+@Data
 @MappedSuperclass
 public class ModelEntity {
 
