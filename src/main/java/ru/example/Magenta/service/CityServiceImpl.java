@@ -4,17 +4,16 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.example.Magenta.DTO.CityDTO;
+import ru.example.Magenta.exceptions.CityCoordinatesAreBusyException;
+import ru.example.Magenta.exceptions.CityIdNotFoundException;
 import ru.example.Magenta.model.City;
 import ru.example.Magenta.repository.CityRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
-import static ru.example.Magenta.exceptions.CityException.*;
 
-/**
- * Service for working with the City model
- */
 @Service
 @AllArgsConstructor
 public class CityServiceImpl implements CityService{
@@ -24,7 +23,8 @@ public class CityServiceImpl implements CityService{
     @Override
     @Transactional
     public Long create(CityDTO cityDTO) {
-        coordinatesAreBusyException(cityDTO,cityRepository);
+        if (cityRepository.findByLatitudeAndLongitude(cityDTO.getLatitude(),cityDTO.getLongitude()).orElse(null) != null)
+        { throw  new CityCoordinatesAreBusyException(cityDTO);}
         City city = cityDTO.toCity();
         return  cityRepository.save(city).getId();
     }
@@ -32,8 +32,7 @@ public class CityServiceImpl implements CityService{
     @Override
     @Transactional
     public void update(CityDTO cityDTO) {
-        City city = cityRepository.findById(cityDTO.getId()).orElse(null);
-        cityIDNotFoundException(city,cityDTO.getId());
+        City city = cityRepository.findById(cityDTO.getId()).orElseThrow(()-> new CityIdNotFoundException(cityDTO.getId()));
         city = cityDTO.update(city);
        cityRepository.save(city);
 
@@ -50,7 +49,7 @@ public class CityServiceImpl implements CityService{
     @Override
     @Transactional
     public void delete(Long id) {
-    cityIDNotFoundException(cityRepository,id);
+        cityRepository.findById(id).orElseThrow(()-> new CityIdNotFoundException(id));
     cityRepository.deleteById(id);
     }
 
@@ -58,12 +57,13 @@ public class CityServiceImpl implements CityService{
     @Transactional(readOnly = true)
     public CityDTO findById(Long id) {
 
-        City city = cityRepository.findById(id).orElse(null);
-        cityIDNotFoundException(city,id);
+        City city = cityRepository.findById(id).orElseThrow(()-> new CityIdNotFoundException(id));
+
 
 
         return  new CityDTO(city);
     }
+
 
 
 }

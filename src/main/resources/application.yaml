@@ -6,12 +6,12 @@ spring:
   datasource:
     username: root
     password: root
-    driver-class-name: com.mysql.jdbc.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/distance-calculator
 
   jpa:
-    database-platform: org.hibernate.dialect.MySQLDialect
     hibernate:
       ddl-auto: none
     show-sql: false
+    database-platform: org.hibernate.dialect.MySQLDialect
 

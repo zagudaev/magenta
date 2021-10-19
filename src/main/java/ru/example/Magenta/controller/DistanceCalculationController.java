@@ -12,13 +12,13 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/testexample")
+@RequestMapping("/distancecalculation")
 public class DistanceCalculationController {
     private final DistanceCalculationImpl testExampleService;
 
 
-    @GetMapping("/calculatedistance")
-    private List<String> CalculateDistance (@RequestBody CalculationType calculationType, List<CityDTO> fromCityList, List<CityDTO> toCityList)
+    @PostMapping
+    private List<String> CalculateDistance ( CalculationType calculationType, List<CityDTO> fromCityList, List<CityDTO> toCityList)
     {return testExampleService.CalculateDistance(calculationType,fromCityList,toCityList);}
 
 
