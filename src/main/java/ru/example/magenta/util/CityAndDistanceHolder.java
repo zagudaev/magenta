@@ -11,17 +11,16 @@ import java.util.List;
 
 @XmlRootElement
 public class CityAndDistanceHolder {
+    private final List<City> valuesCity = new ArrayList<>();
+    private final List<Distance> valuesDistance = new ArrayList<>();
 
-    private List<City> valuesCity = new ArrayList<>();
-    private List<Distance> valuesDistance = new ArrayList<>();
     @XmlElement
     public List<City> getValuesCity() {
         return valuesCity;
     }
+
     @XmlElement
-    public List<Distance> getValuesDistance(){
+    public List<Distance> getValuesDistance() {
         return valuesDistance;
     }
-
-
 }

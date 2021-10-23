@@ -1,6 +1,6 @@
 package ru.example.magenta.service;
 
-import ru.example.magenta.dto.CityDTO;
+import ru.example.magenta.dto.CityDto;
 import ru.example.magenta.util.CalculationType;
 
 import java.util.List;
@@ -9,13 +9,15 @@ import java.util.List;
  */
 public interface DistanceCalculation {
 
+    double AVERAGE_RADIUS_OF_EARTH_KM = 6371;
+
     /**
      *Method for calculating the distance "in a straight line"
      * @param fromCity
      * @param toCity
      * @return distance "in a straight line"
      */
-    double crowflight(CityDTO fromCity, CityDTO toCity);
+    double crowFlight(CityDto fromCity, CityDto toCity);
 
 
     /**
@@ -24,7 +26,7 @@ public interface DistanceCalculation {
      * @param toCity
      * @return
      */
-    double distanceMatrix(CityDTO fromCity, CityDTO toCity);
+    double distanceMatrix(CityDto fromCity, CityDto toCity);
 
 
     /**
@@ -34,7 +36,7 @@ public interface DistanceCalculation {
      * @param toCityList
      * @return
      */
-    List<String> CalculateDistance(CalculationType calculationType, List<CityDTO> fromCityList, List<CityDTO> toCityList);
+    List<String> calculateDistance(CalculationType calculationType, List<CityDto> fromCityList, List<CityDto> toCityList);
 
 
 }

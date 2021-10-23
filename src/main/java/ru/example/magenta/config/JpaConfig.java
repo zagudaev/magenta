@@ -11,56 +11,65 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
 import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 @EnableJpaRepositories(basePackages = "ru")
 @EnableTransactionManagement
 public class JpaConfig {
     @Value("${spring.datasource.url}")
-    String url;
+    private String url;
     @Value("${spring.datasource.username}")
-    String username;
+    private String username;
     @Value("${spring.datasource.password}")
-    String password;
+    private String password;
     @Value("${spring.datasource.driver-class-name}")
-    String driverClassName;
+    private String driverClassName;
     @Value("${spring.jpa.hibernate.ddl-auto}")
-    String ddlAuto;
+    private String ddlAuto;
     @Value("${spring.jpa.properties.hibernate.dialect}")
-    String dialect;
+    private String dialect;
     @Value("${spring.jpa.show-sql}")
-    String showSql;
+    private String showSql;
 
 
     @Bean
     public DataSource dataSource() {
         DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
+
         dataSourceBuilder.username(username);
         dataSourceBuilder.password(password);
         dataSourceBuilder.url(url);
+
         return dataSourceBuilder.build();
     }
 
 
-   @Bean
-   public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
+    @Bean
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
+        HibernateJpaVendorAdapter adapter = new HibernateJpaVendorAdapter();
 
-       HashMap<String, String> hibernateProperties = new HashMap<>();
-//        hibernateProperties.put("hibernate.hbm2ddl.auto", "create-drop");
-       hibernateProperties.put("hibernate.hbm2ddl.auto", ddlAuto);
-       hibernateProperties.put("hibernate.connection.driver_class", driverClassName);
-       hibernateProperties.put("hibernate.dialect", dialect);
-       hibernateProperties.put("hibernate.show_sql", showSql);
+        adapter.setGenerateDdl(true);
 
-       HibernateJpaVendorAdapter adapter = new HibernateJpaVendorAdapter();
-       adapter.setGenerateDdl(true);
-       LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
-       factory.setJpaVendorAdapter(adapter);
-       factory.setPackagesToScan("ru");
-       factory.setDataSource(dataSource());
-       factory.setJpaPropertyMap(hibernateProperties);
-       return factory;
-   }
+        LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
 
+        factory.setJpaVendorAdapter(adapter);
+        factory.setPackagesToScan("ru");
+        factory.setDataSource(dataSource());
+        factory.setJpaPropertyMap(getHibernateProperties());
+
+        return factory;
+    }
+
+    private Map<String, String> getHibernateProperties() {
+        HashMap<String, String> hibernateProperties = new HashMap<>();
+
+        hibernateProperties.put("hibernate.hbm2ddl.auto", ddlAuto);
+        hibernateProperties.put("hibernate.connection.driver_class", driverClassName);
+        hibernateProperties.put("hibernate.dialect", dialect);
+        hibernateProperties.put("hibernate.show_sql", showSql);
+
+        return hibernateProperties;
+    }
 
 }

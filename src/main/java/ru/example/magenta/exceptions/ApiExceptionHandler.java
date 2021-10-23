@@ -11,9 +11,8 @@ import java.time.LocalDateTime;
 @ControllerAdvice
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
-
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<Object> handlerException(RuntimeException ex){
-        return  new ResponseEntity<Object>(new ApiException(ex.getMessage(), HttpStatus.BAD_REQUEST, LocalDateTime.now()),HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ApiException> handlerException(RuntimeException ex) {
+        return new ResponseEntity<>(new ApiException(ex.getMessage(), HttpStatus.BAD_REQUEST, LocalDateTime.now()), HttpStatus.BAD_REQUEST);
     }
 }

@@ -2,97 +2,83 @@ package ru.example.magenta.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.example.magenta.dto.CityDTO;
+import ru.example.magenta.dto.CityDto;
 import ru.example.magenta.exceptions.DistanceIsBusyException;
-import ru.example.magenta.model.Distance;
 import ru.example.magenta.repository.DistanceRepository;
 import ru.example.magenta.util.CalculationType;
 
-
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
 @AllArgsConstructor
 public class DistanceCalculationImpl implements DistanceCalculation {
+
     private final DistanceRepository distanceRepository;
-    private static final double AVERAGE_RADIUS_OF_EARTH_KM = 6371;
 
     @Override
-    public double crowflight(CityDTO fromCity, CityDTO toCity) {
-
+    public double crowFlight(CityDto fromCity, CityDto toCity) {
         double fromCityLat = fromCity.getLatitude();
         double fromCityLng = fromCity.getLongitude();
         double toCityLat = toCity.getLatitude();
         double toCityLng = toCity.getLongitude();
 
-            double latDistance = Math.toRadians(fromCityLat - toCityLat);
-            double lngDistance = Math.toRadians(fromCityLng - toCityLng);
+        double latDistance = Math.toRadians(fromCityLat - toCityLat);
+        double lngDistance = Math.toRadians(fromCityLng - toCityLng);
 
-            double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
-                    + Math.cos(Math.toRadians(fromCityLat)) * Math.cos(Math.toRadians(toCityLat))
-                    * Math.sin(lngDistance / 2) * Math.sin(lngDistance / 2);
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                + Math.cos(Math.toRadians(fromCityLat)) * Math.cos(Math.toRadians(toCityLat))
+                * Math.sin(lngDistance / 2) * Math.sin(lngDistance / 2);
 
-            double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-            return  (Math.round(AVERAGE_RADIUS_OF_EARTH_KM * c*100)/100.00);
+        return (Math.round(AVERAGE_RADIUS_OF_EARTH_KM * c * 100) / 100.00);
+    }
+
+    @Override
+    public double distanceMatrix(CityDto fromCity, CityDto toCity) {
+        if (fromCity.equals(toCity)) {
+            return 0;
+        }
+
+        return distanceRepository.findByToCityAndFromCity(fromCity.getName(), toCity.getName())
+                .orElseThrow(() -> new DistanceIsBusyException(fromCity, toCity))
+                .getDistance();
     }
 
 
     @Override
-    public double distanceMatrix(CityDTO fromCity, CityDTO toCity) {
-        if (!fromCity.equals(toCity)){
-        Distance distance = distanceRepository.findByToCityAndFromCity(fromCity.getName(),toCity.getName()).orElseThrow(()-> new DistanceIsBusyException(fromCity, toCity));
-        return  distance.getDistance();}
-        else {return 0;}
-    }
-
-
-
-    @Override
-    public List<String> CalculateDistance(CalculationType calculationType, List<CityDTO> fromCityList, List<CityDTO> toCityList) {
-        List<String> list = new ArrayList<>();
-
+    public List<String> calculateDistance(CalculationType calculationType, List<CityDto> fromCityList, List<CityDto> toCityList) {
         switch (calculationType) {
-            case CROWFLIGHT: {
-                for (CityDTO fromCity : fromCityList) {
-                    for (CityDTO toCity : toCityList) {
-                        list.add("Расстояние из " + fromCity.getName() + " до " + toCity.getName() + " по методу crowflight :  " + crowflight(fromCity, toCity));
-                    }
-                }
-                break;
+            case CROW_FLIGHT: {
+                return calculateByCrowFlight(fromCityList, toCityList);
             }
             case DISTANCE_MATRIX: {
-                for (CityDTO fromCity : fromCityList) {
-                    for (CityDTO toCity : toCityList) {
-                        list.add("Расстояние из " + fromCity.getName() + " до " + toCity.getName() + " по методу distanceMatrix :  " + distanceMatrix(fromCity, toCity));
-                    }
-                }
-                break;
+                return calculateByDistanceMatrix(fromCityList, toCityList);
             }
             case ALL: {
-                for (CityDTO fromCity : fromCityList) {
-                    for (CityDTO toCity : toCityList) {
-                        list.add("Расстояние из " + fromCity.getName() + " до " + toCity.getName() + " по методу crowflight :  " + crowflight(fromCity, toCity)
-                                + " по методу distanceMatrix :  " + distanceMatrix(fromCity, toCity));
-                    }
-                }
-                break;
+                return Collections.singletonList(calculateByCrowFlight(fromCityList, toCityList) + " " + calculateByDistanceMatrix(fromCityList, toCityList));
             }
         }
-        return list;
+
+        throw new IllegalArgumentException(calculationType.name());
     }
 
+    public List<String> calculateByCrowFlight(List<CityDto> fromCityList, List<CityDto> toCityList) {
+        return fromCityList.stream()
+                .flatMap(fromCity -> toCityList.stream()
+                        .map(toCity -> "Расстояние из " + fromCity.getName() + " до " + toCity.getName() + " по методу crowflight :  " + crowFlight(fromCity, toCity)))
+                .collect(Collectors.toList());
+    }
 
-
-
-
-
-
-
-
-
-
+    public List<String> calculateByDistanceMatrix(List<CityDto> fromCityList, List<CityDto> toCityList) {
+        return fromCityList.stream()
+                .flatMap(fromCity -> toCityList.stream()
+                        .map(toCity -> "Расстояние из " + fromCity.getName() + " до " + toCity.getName() + " по методу distanceMatrix :  " + distanceMatrix(fromCity, toCity)))
+                .collect(Collectors.toList());
+    }
 }
 

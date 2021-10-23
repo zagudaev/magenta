@@ -3,9 +3,10 @@ package ru.example.magenta.service;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.example.magenta.dto.DistanceDTO;
-import ru.example.magenta.exceptions.DistanceIDNotFoundException;
+import ru.example.magenta.dto.DistanceDto;
 import ru.example.magenta.exceptions.DistanceIsBusyException;
+import ru.example.magenta.exceptions.DistanceNotFoundException;
+import ru.example.magenta.model.City;
 import ru.example.magenta.model.Distance;
 import ru.example.magenta.repository.CityRepository;
 import ru.example.magenta.repository.DistanceRepository;
@@ -19,37 +20,44 @@ public class DistanceServiceImpl implements DistanceService {
 
     @Override
     @Transactional
-    public Long create(DistanceDTO distanceDTO) {
-       if (!distanceRepository.findByToCityAndFromCity(distanceDTO.getToCity(), distanceDTO.getFromCity()).isPresent()){
-           throw  new DistanceIsBusyException(distanceDTO);}
-        Distance distance = distanceDTO.toDistance(cityRepository);
-        Distance distanceRevers = distanceDTO.toDistanceRevers(cityRepository);
+    public Long create(DistanceDto distanceDto) {
+        if (!distanceRepository.findByToCityAndFromCity(distanceDto.getToCity(), distanceDto.getFromCity()).isPresent()) {
+            throw new DistanceIsBusyException(distanceDto);
+        }
+        City fromCity = cityRepository.findByName(distanceDto.getFromCity()).get();
+        City toCity = cityRepository.findByName(distanceDto.getToCity()).get();
+        Distance distance = distanceDto.toDistance(fromCity,toCity);
+        Distance distanceRevers = distanceDto.toDistanceRevers(fromCity,toCity);
+
         distanceRepository.save(distanceRevers);
         return distanceRepository.save(distance).getId();
     }
 
     @Override
     @Transactional
-    public void update(DistanceDTO distanceDTO) {
-        Distance distance = distanceRepository.findById(distanceDTO.getId()).orElseThrow(()->new DistanceIDNotFoundException(distanceDTO.getId()));
+    public void update(DistanceDto distanceDto) {
+        Distance distance = findByIdNN(distanceDto.getId());
+        City fromCity = cityRepository.findByName(distanceDto.getFromCity()).get();
+        City toCity = cityRepository.findByName(distanceDto.getToCity()).get();
 
-        distance = distanceDTO.update(distance, cityRepository);
+        distance = distanceDto.update(distance, fromCity,toCity);
+
         distanceRepository.save(distance);
     }
 
     @Override
     @Transactional
     public void delete(Long id) {
-        distanceRepository.findById(id).orElseThrow(()->new DistanceIDNotFoundException(id));
         distanceRepository.deleteById(id);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public DistanceDTO findById(Long id) {
-        Distance distance = distanceRepository.findById(id).orElseThrow(()->new DistanceIDNotFoundException(id));
-        return new DistanceDTO(distance);
+    public DistanceDto findById(Long id) {
+        return new DistanceDto(findByIdNN(id));
     }
 
-
+    public Distance findByIdNN(Long id) {
+        return distanceRepository.findById(id).orElseThrow(() -> new DistanceNotFoundException(id));
+    }
 }
